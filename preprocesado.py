@@ -86,10 +86,11 @@ def eliminar_repetidos(libro_preprocesado):
     return list(set(palabras)) 
 
 #Pruebas
-linea = "Next day the flames had disappeared, and the French officers"
-print(preprocesar_linea(linea))
+if __name__ == '__main__':
+    linea = "Next day the flames had disappeared, and the French officers"
+    print(preprocesar_linea(linea))
 
-filename = "Moby Dick Or The Whale by Herman Melville 4528.txt"
-libro = leer_libro(filename)
-libro = preprocesar_libro(libro)
-print(eliminar_repetidos(libro))
+    filename = "Moby Dick Or The Whale by Herman Melville 4528.txt"
+    libro = leer_libro(filename)
+    libro = preprocesar_libro(libro)
+    print(eliminar_repetidos(libro))
