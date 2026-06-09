@@ -12,7 +12,7 @@ def limpiar_tokens(tokens, stopwords):
     (regresa lista de palabras sin stopwords)
 
     """
-    #Usamos el [:] para modificar la lista original internamente
+    # Usamos el [:] para modificar la lista original internamente
     tokens[:] = [token for token in tokens if token not in stopwords]
     return tokens
 
@@ -45,13 +45,13 @@ def leer_libro(filename) -> list[str]:
     primer línea no vacía y así sucesivamente).
 
     """
-    #Inicializamos el libro en lista vacia
+    # Inicializamos el libro en lista vacia
     libro = []
-    #Abrimos el archivo, la r es para modo lectura
+    # Abrimos el archivo, la r es para modo lectura
     with open("./Books/" + filename, "r", encoding="utf-8") as archivo:
         for linea in archivo:
             linea_limpia = linea.strip()
-            #Si la linea no esta vacia pues la agregamos a la lista
+            # Si la linea no esta vacia pues la agregamos a la lista
             if linea_limpia:
                 libro.append(linea_limpia)
     return libro
@@ -76,12 +76,12 @@ def preprocesar_libro(
     # La siguiente línea puede serte de ayuda
     # from string import punctuation
 
-    #Inicializamos las frecuencias como un diccionario vacio
+    # Inicializamos las frecuencias como un diccionario vacio
     frecuencias = {}
-    #Aplicamos el preprocesar linea a cada linea del libro
+    # Aplicamos el preprocesar linea a cada linea del libro
     for linea in libro:
         tokens_limpios = preprocesar_linea(linea, caracteres_especiales, stopwords)
-        #Se suman las frecuencias al diccionario
+        # Se suman las frecuencias al diccionario
         for token in tokens_limpios:
             frecuencias[token] = frecuencias.get(token, 0) + 1      
     return frecuencias

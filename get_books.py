@@ -26,12 +26,12 @@ def get_links(n: int | list[int] = -1) -> tuple[ list[str], list[str] ]:
     titles : list[str]
         Títulos de los libros.
     """
-    #URL para los libros
+    # URL para los libros
     url = "https://www.gutenberg.org/browse/scores/top"
-    #Inicializamos lo que debe regresar la funcion
+    # Inicializamos lo que debe regresar la funcion
     links = [] 
     titles = []
-    #Coso para que no nos bloquee el navegador
+    # Coso para que no nos bloquee el navegador
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
@@ -39,28 +39,28 @@ def get_links(n: int | list[int] = -1) -> tuple[ list[str], list[str] ]:
     try:
         response = requests.get(url, headers = headers)
         response.raise_for_status()
-        #Parsear
+        # Parsear
         parser = BeautifulSoup(response.text, 'html.parser')
-        #Buscamos todas las etiquetas <a>
+        # Buscamos todas las etiquetas <a>
         etiquetas = parser.find_all("a")
         contador_libros_validos = 0
         if isinstance(n, (list, range)):
             n = set(n)
         for enlace in etiquetas:
             direccion_libro = enlace.get("href", "")
-            #Filtramos el contenenido para que solo sea de esa pagina
+            # Filtramos el contenenido para que solo sea de esa pagina
             if direccion_libro.startswith("/ebooks/"):
                 book_id = direccion_libro.split("/")[-1]
-                #Solo contamos el libro si confirmamos que tiene un ID numérico válido
+                # Solo contamos el libro si confirmamos que tiene un ID numérico válido
                 if book_id.isdigit():
                     contador_libros_validos += 1
-                    #Esto es para saber cuantos libros descargar, es decir si es -1 los descarga todos y si pone otro numero pues esos descarga (rangos tambien), ojito ahi
+                    # Esto es para saber cuantos libros descargar, es decir si es -1 los descarga todos y si pone otro numero pues esos descarga (rangos tambien), ojito ahi
                     if n == -1 or (isinstance(n, int) and contador_libros_validos <= n) or (isinstance(n, set) and contador_libros_validos in n):   
-                        #Generamos el URL necesario para la descarga
+                        # Generamos el URL necesario para la descarga
                         txt_url = f"https://www.gutenberg.org/cache/epub/{book_id}/pg{book_id}.txt"
-                        #Guardamos el titulo del libro
+                        # Guardamos el titulo del libro
                         titulo_libro = enlace.get_text(strip = True)
-                        #Eliminar caracteres especiales de los titulos
+                        # Eliminar caracteres especiales de los titulos
                         titulo_limpio = "".join(caracter for caracter in titulo_libro if caracter.isalnum() or caracter in "._- ").rstrip()
                         titulo_libro = f"{titulo_limpio[:50]}.txt"  
                         links.append(txt_url)
@@ -75,31 +75,31 @@ def download_file(url, name, directory):
     """Guarda un archivo que se encuentra en un `url` bajo el nombre que demos
     en `name` en el directorio deseado.
     """
-    #Crear el directorio si no existe
+    # Crear el directorio si no existe
     if not os.path.exists(directory):
         os.makedirs(directory)
         
     ruta_completa = os.path.join(directory, name)
     
     try:
-        #Direccion principal
+        # Direccion principal
         response = requests.get(url, stream=True)
         
-        #Esto es por si falla la primera URL
+        # Esto es por si falla la primera URL
         if response.status_code == 404:
             #Obtenemos el ID del libro directamente desde la URL
             book_id = url.split("/")[-2] 
             
-            #Creamos una URL de respaldo (es como el de la primera funcion)
+            # Creamos una URL de respaldo (es como el de la primera funcion)
             url_respaldo = f"https://gutenberg.org{book_id}/{book_id}-0.txt"
             
-            #Reintentamos la petición con la nueva dirección
+            # Reintentamos la petición con la nueva dirección
             response = requests.get(url_respaldo, stream=True)
             
-        #Si ambos intentos fallan, este coso dara error para asi poder ir al except
+        # Si ambos intentos fallan, este coso dara error para asi poder ir al except
         response.raise_for_status() 
         
-        #Si la descarga es exitosa, guardamos el archivo por fragmentos
+        # Si la descarga es exitosa, guardamos el archivo por fragmentos
         with open(ruta_completa, mode='wb') as file:
             for chunk in response.iter_content(chunk_size=10 * 1024):  # 10kb chunks
                 file.write(chunk)
@@ -122,5 +122,5 @@ def main(n = -1, directory='./'):
 
 if __name__ == '__main__':
     directory = 'Books/'
-    n = range(25) #Esto se puede modificar si queremos, es la cantidad de libros a descargar (tambien puede ser rangos)
+    n = range(1) # Esto se puede modificar si queremos, es la cantidad de libros a descargar (tambien puede ser rangos)
     main(n, directory)

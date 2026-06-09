@@ -31,9 +31,9 @@ class Libro:
         def filename(self, value):
         #     """Checar que el nombre sea un string y que el archivo existe"""
             archivo = Path(value)
-            if not isinstance(value, str): #Si no es un string mandamos un error de tipo
+            if not isinstance(value, str): # Si no es un string mandamos un error de tipo
                 raise TypeError("El nombre del archivo debe ser un string")
-            if not archivo.exists(): #Si no existe el archivo mandamos un error de no encontrado
+            if not archivo.exists(): # Si no existe el archivo mandamos un error de no encontrado
                 raise FileNotFoundError("El archivo no existe") 
             self._filename = value
 
@@ -51,7 +51,7 @@ class Libro:
         original. (regresa lista de palabras sin stopwords)
 
         """
-        #Usamos el [:] para modificar la lista original internamente
+        # Usamos el [:] para modificar la lista original internamente
         tokens[:] = [token for token in tokens if token not in self.STOPWORDS]
         return tokens
 
@@ -87,13 +87,13 @@ class Libro:
         primer línea no vacía y así sucesivamente).
 
         """
-        #Inicializamos el libro en lista vacia
+        # Inicializamos el libro en lista vacia
         libro = []
-        #Abrimos el archivo, la r es para modo lectura
+        # Abrimos el archivo, la r es para modo lectura
         with open("./Books/" + self.filename, "r", encoding="utf-8") as archivo:
             for linea in archivo:
                 linea_limpia = linea.strip()
-                #Si la linea no esta vacia pues la agregamos a la lista
+                # Si la linea no esta vacia pues la agregamos a la lista
                 if linea_limpia:
                     libro.append(linea_limpia)
         return libro
@@ -110,14 +110,14 @@ class Libro:
         en caso contrario.
 
         """
-        #Inicializamos las frecuencias como un diccionario vacio
+        # Inicializamos las frecuencias como un diccionario vacio
         frecuencias = {}
-        #Obtenemos las lineas del libro
+        # Obtenemos las lineas del libro
         lineas_libro = self.leer_libro()
-        #Aplicamos el preprocesar linea a cada linea del libro
+        # Aplicamos el preprocesar linea a cada linea del libro
         for linea in lineas_libro:
             tokens_limpios = self._preprocesar_linea(linea)
-            #Se suman las frecuencias al diccionario
+            # Se suman las frecuencias al diccionario
             for token in tokens_limpios:
                 frecuencias[token] = frecuencias.get(token, 0) + 1      
         return frecuencias
@@ -149,8 +149,8 @@ class Libro:
           https://realpython.com/python-classes/#special-methods-and-protocols
 
         """
-        #El !r sirve para que el texto aparezca con comillas
-        #Fuerza la representación tecnica (repr) para que el texto conserve sus comillas
+        # El !r sirve para que el texto aparezca con comillas
+        # Fuerza la representación tecnica (repr) para que el texto conserve sus comillas
         return f"name = {self.name!r}, filename = {self.filename!r}"
 
 # Los libros del proyecto Gutenberg empiezan dando información sobre el
@@ -168,24 +168,24 @@ class LibroGutenberg(Libro):
         libro que se encuentran entre las líneas `*** START` y `*** END`.)
 
         """
-        #Inicializamos el libro como lista vacia
+        # Inicializamos el libro como lista vacia
         libro = []
-        #Esto es para saber si ya estamos dentro del contenido libro y no el copyright y los creditos
-        #Actuara como una bandera
+        # Esto es para saber si ya estamos dentro del contenido libro y no el copyright y los creditos
+        # Actuara como una bandera
         es_contenido = False
-        #Esto es lo mismo de lo del preprocesado.py
+        # Esto es lo mismo de lo del preprocesado.py
         with open(self.filename, "r", encoding="utf-8") as archivo:
             for linea in archivo:
                 linea_limpia = linea.strip()
-                #Si encontramos la linea que inicia con "*** START", la bandera se activa
+                # Si encontramos la linea que inicia con "*** START", la bandera se activa
                 if linea_limpia.startswith("*** START"):
                     es_contenido = True
-                    continue  #Esto es para saltarnos esa linea del "*** START" y siga su camino 
-                #Si encontramos la linea que inicia con "*** END", desactivamos la bandera y salimos
+                    continue  # Esto es para saltarnos esa linea del "*** START" y siga su camino 
+                # Si encontramos la linea que inicia con "*** END", desactivamos la bandera y salimos
                 if linea_limpia.startswith("*** END"):
                     es_contenido = False
-                    break  #Si ya llegamos al final pues no tiene caso seguir buscando         
-                #Solo si la bandera esta activa y la línea no esta vacia, la guardamos
+                    break  # Si ya llegamos al final pues no tiene caso seguir buscando         
+                # Solo si la bandera esta activa y la línea no esta vacia, la guardamos
                 if es_contenido and linea_limpia:
                     libro.append(linea_limpia)
         return libro
@@ -230,7 +230,7 @@ def crear_lista_libros_ingles(directory: str, caract_especiales=punctuation):
         libros.append(libro)
     return libros
 
-#Pruebas
+# Pruebas
 if __name__ == "__main__":
     mi_libro = Libro("Moby Dick", "./Books/moby.txt")
     print(mi_libro)

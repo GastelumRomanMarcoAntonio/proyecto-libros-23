@@ -7,11 +7,11 @@ def main(filename: str) -> dict[str, int]:
     # Utilizar los caracteres dados por `punctuation` en la librería `string`
     from string import punctuation
     caracteres_especiales = punctuation
-    #Definir lista con stopwords
+    # Definir lista con stopwords
     # Utilizar los stopword en inglés dados en la librería nltk (como vimos en
     # clase).
     # stopwords = ...
-    #Descargar los stopwords
+    # Descargar los stopwords
     try:
         nltk.data.find('corpora/stopwords') #Busca si ya estan descargados y si lo esta, pues continua normal
     except LookupError:
