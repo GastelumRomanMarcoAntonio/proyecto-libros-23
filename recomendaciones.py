@@ -98,7 +98,7 @@ class Recomendador:
         for idx, libro in enumerate(self.libros):
             # Mostramos el indice y el nombre del libro
             print(f" Indice [{idx}]: {libro.name}")
-        print("-" * 43) # Puro diseño nada mas
+        print("-" * 50) # Puro diseño nada mas
 
     def resumen(self, idx_libro, num_palabras) -> list[str]:
         """Regresa una lista con las palabras más representativas de un libro

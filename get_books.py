@@ -46,14 +46,17 @@ def get_links(n: int | list[int] = -1) -> tuple[ list[str], list[str] ]:
         contador_libros_validos = 0
         if isinstance(n, (list, range)):
             n = set(n)
+        # Creamos un conjunto para guardar ids y que estas no se repitan
+        ids_vistos = set()
         for enlace in etiquetas:
             direccion_libro = enlace.get("href", "")
             # Filtramos el contenenido para que solo sea de esa pagina
             if direccion_libro.startswith("/ebooks/"):
                 book_id = direccion_libro.split("/")[-1]
-                # Solo contamos el libro si confirmamos que tiene un ID numérico válido
-                if book_id.isdigit():
-                    contador_libros_validos += 1
+                # Solo contamos el libro si confirmamos que tiene un ID numerico y la id no ha sido vista
+                if book_id.isdigit() and book_id not in ids_vistos:
+                    ids_vistos.add(book_id)  # Guardamos el ID para no volverlo a contar
+                    contador_libros_validos += 1 # Aumentamos el contador de libros validos
                     # Esto es para saber cuantos libros descargar, es decir si es -1 los descarga todos y si pone otro numero pues esos descarga (rangos tambien), ojito ahi
                     if n == -1 or (isinstance(n, int) and contador_libros_validos <= n) or (isinstance(n, set) and contador_libros_validos in n):   
                         # Generamos el URL necesario para la descarga
