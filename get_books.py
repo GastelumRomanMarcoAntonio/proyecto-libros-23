@@ -122,5 +122,5 @@ def main(n = -1, directory='./'):
 
 if __name__ == '__main__':
     directory = 'Books/'
-    n = range(1, 6) #Esto se puede modificar si queremos, es la cantidad de libros a descargar, o en este caso el rango
+    n = range(25) #Esto se puede modificar si queremos, es la cantidad de libros a descargar (tambien puede ser rangos)
     main(n, directory)

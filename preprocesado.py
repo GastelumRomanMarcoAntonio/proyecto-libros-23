@@ -1,96 +1,87 @@
-from stopwords import stopwords
-
-def minusculas(linea):
-    """Esta función toma una linea de texto (string) y transforma todos los
-    carácteres a minúsculas (regresa un string)
+def limpiar_linea(linea, caracteres_especiales):
+    """Esta función toma una línea de texto (str) y un iterable de caracteres
+    especiales y regresa la línea sin dichos caracteres (.,?!*/).
 
     """
-    nueva_linea = linea.lower()
-    return nueva_linea
-
-def limpiar_linea(linea):
-    """Esta función acepta una línea de texto (str) y regresa un nuevo string
-    sin caracteres especiales (.,?!*/).
-    El módulo string de la librería estándar de python contiene estos
-    caracteres si los desean. Los incluyo al principio de su código.
-
-    """
-    from string import punctuation #Esta cosa tiene los signos de puntuacion
-    #Ira agregando caracteres si estos no son algunos de los que estan en punctuation
-    linea_limpia = "".join(caracter for caracter in linea if caracter not in punctuation)
+    linea_limpia = "".join(caracter for caracter in linea if caracter not in caracteres_especiales)
     return linea_limpia
 
-def obtener_tokens(linea):
-    """Esta función recibe una línea de texto y la transforma en una lista
-    cuyos elementos son las palabras en la linea.
-
-    """
-    nueva_linea = linea.split()
-    return nueva_linea
-
 def limpiar_tokens(tokens, stopwords):
-    """Esta función recibe una lista de palabras (tokens) y elimina aquellas
-    que se encuentren en la lista de stopwords (regresa lista de palabras sin
-    stopwords).
+    """Esta función recibe una lista de palabras (`tokens`) y elimina aquellas
+    que se encuentren en el iterable `stopwords` modificando la lista original.
+    (regresa lista de palabras sin stopwords)
 
     """
-    tokens_limpios = [caracter for caracter in tokens if caracter not in stopwords]
-    return tokens_limpios
+    #Usamos el [:] para modificar la lista original internamente
+    tokens[:] = [token for token in tokens if token not in stopwords]
+    return tokens
 
-def preprocesar_linea(linea):
-    """Esta función aplica las funciones anteriores a una línea de texto
-    (string). Debe regresar tokens limpios (lista de strings).
+def preprocesar_linea(linea, caracteres_especiales, stopwords) -> list[str]:
+    """Limpia una línea de texto regresando tokens  limpios. La limpieza debe
+    considerar eliminar espacios blancos al principio y final de la línea,
+    convertir a minúsculas, eliminar caracteres especiales, crear tokens y
+    eliminar stopwords en estos tokens.
+
+    Esta función debe aplicar las funciones anteriores donde sea necesario.
+    Debe regresar tokens limpios (lista de strings).
 
     """
-    linea_preprocesada = minusculas(linea)
-    linea_preprocesada = limpiar_linea(linea_preprocesada)
-    linea_preprocesada = obtener_tokens(linea_preprocesada)
-    linea_preprocesada = limpiar_tokens(linea_preprocesada, stopwords)
-    return linea_preprocesada
+    # eliminar espacios blancos al principio y final de la línea
+    linea_limpia = linea.strip()
+    # convierte la linea a minúsculas
+    linea_limpia = linea_limpia.lower()
+    # elimina los caracteres especiales
+    linea_limpia = limpiar_linea(linea_limpia, caracteres_especiales)
+    # obten tokens: cada palabra debe aparecer como un elemento de una lista
+    tokens = linea_limpia.split()
+    # limpia la lista de tokens
+    tokens = limpiar_tokens(tokens, stopwords)
+    return tokens
 
-def preprocesar_libro(libro):
-    """Aplica preprocesar_linea a cada linea de un libro. El libro consiste en
-    una lista, donde cada elemento es una linea del libro.
+def leer_libro(filename) -> list[str]:
+    """Dado el nombre de un archivo debe leer cada línea, agregando aquellas
+    que no esten vacías a una lista, es decir, debe regresar una lista cuyos
+    elementos son las líneas no vacías del libro (el primer elemento es la
+    primer línea no vacía y así sucesivamente).
 
-    Debe regresar una lista de listas. Las listas interiores son los tokens
-    limpios de cada línea.
-    """
-    #Inicializamos el libro preprocesado en lista vacia
-    libro_preprocesado = []
-    #Por cada elemento de la lista aplicamos el preprocesado
-    for linea in libro:
-        libro_preprocesado.append(preprocesar_linea(linea))
-    #Esto es para limpiar las listas vacias
-    libro_preprocesado = [linea for linea in libro_preprocesado if linea]
-    return libro_preprocesado
-
-def leer_libro(filename):
-    """Dado el nombre de un archivo, debe leer línea a línea agregandolas a una
-    lista, es decir, debe regresar una lista cuyos elementos son las líneas.
     """
     #Inicializamos el libro en lista vacia
     libro = []
     #Abrimos el archivo, la r es para modo lectura
-    with open("./Books/" + filename, "r", encoding = "utf-8") as archivo:
+    with open("./Books/" + filename, "r", encoding="utf-8") as archivo:
         for linea in archivo:
-            libro.append(linea.strip())
+            linea_limpia = linea.strip()
+            #Si la linea no esta vacia pues la agregamos a la lista
+            if linea_limpia:
+                libro.append(linea_limpia)
     return libro
 
-def eliminar_repetidos(libro_preprocesado):
-    #Inicializamos las palabras que no estaran repetidas en lista vacia
-    palabras = []
-    #Por cada elemento de la lista de listas 
-    for linea in libro_preprocesado:
-        palabras.extend(linea) #El extend es para agregar elementos sueltos a la lista y no la lista entera
-    #Primero transformamos en un conjunto el cual no acepta repetidos para luego regresarlo nuevamente a una lista
-    return list(set(palabras)) 
+def preprocesar_libro(
+    libro: list[str], caracteres_especiales, stopwords
+) -> dict[str, int]:
+    """Regresa un diccionario de palabras relevantes del libro como llaves
+    (los tokens limpios) y sus respectivas frecuencias como valores. Por
+    ejemplo, puede regresar:
+        {'shrek': 55, 'fiona': 43, 'caminando': 8}
 
-#Pruebas
-if __name__ == '__main__':
-    linea = "Next day the flames had disappeared, and the French officers"
-    print(preprocesar_linea(linea))
+    Para hacer esto, aplica `preprocesar_linea` a cada linea del `libro`
+    agregando cada token limpio al diccionario si la palabra no existe o
+    aumentado el contador de palabras correspondiente en caso contrario.
 
-    filename = "Moby Dick Or The Whale by Herman Melville 4528.txt"
-    libro = leer_libro(filename)
-    libro = preprocesar_libro(libro)
-    print(eliminar_repetidos(libro))
+    El libro consiste en una lista con las líneas de este.
+
+    El módulo string de la librería estándar de python contiene estos
+    caracteres si los desean. Los incluyo al principio de su código.
+    """
+    # La siguiente línea puede serte de ayuda
+    # from string import punctuation
+
+    #Inicializamos las frecuencias como un diccionario vacio
+    frecuencias = {}
+    #Aplicamos el preprocesar linea a cada linea del libro
+    for linea in libro:
+        tokens_limpios = preprocesar_linea(linea, caracteres_especiales, stopwords)
+        #Se suman las frecuencias al diccionario
+        for token in tokens_limpios:
+            frecuencias[token] = frecuencias.get(token, 0) + 1      
+    return frecuencias
